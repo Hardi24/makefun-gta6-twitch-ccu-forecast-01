@@ -337,7 +337,9 @@ def forecast_case(case, name):
         h = row["hour"]
         qs = []
         prev = 0.0
-        for q in fc[h]:
+        # Defensive: an hour outside 2..24 (or a pool too small to fit)
+        # falls back to the persistence forecast instead of failing.
+        for q in fc.get(h, _fallback(p1, h)):
             q = round2(min(1e9, max(1.0, q)))
             q = max(q, prev)  # keep non-decreasing after rounding
             qs.append(q)
